@@ -5,7 +5,7 @@ This Salesforce Acceso Code handles secure access to the Salesforce Public Site 
 ## 🔐 Email Verification Workflow
 
 1. **Access Request**:
-   - User enters their **company email** on the public RFP site.
+   - User enters their **company email** on the public Salesforce site.
 
 2. **Email Validation**:
    - The domain is checked against a list of allowed domains stored in `Email_Domain__mdt` (Custom Metadata).
