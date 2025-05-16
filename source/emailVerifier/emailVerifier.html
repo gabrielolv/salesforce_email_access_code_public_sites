@@ -21,10 +21,16 @@
             <template if:true={isVerifyStep}>
                 <lightning-input label="Access Code" value={accessCode} onchange={handleCodeChange} class="slds-m-bottom_small"></lightning-input>
                 <div class="slds-text-align_center">
-                    <lightning-button variant="brand" label="Verify Code" onclick={handleVerify} class="slds-m-bottom_small"></lightning-button>
-                    <template if:true={canResendCode}>
-                        <lightning-button label="Resend Code" onclick={handleResendCode} variant="neutral"></lightning-button>
-                    </template>
+                    <div class="slds-grid slds-grid_align-center slds-gutters slds-wrap">
+                        <div class="slds-col">
+                            <lightning-button variant="brand" label="Verify Code" onclick={handleVerify} class="slds-m-bottom_small"></lightning-button>
+                        </div>
+                        <template if:true={canResendCode}>
+                            <div class="slds-col">
+                                <lightning-button label="Resend Code" onclick={handleResendCode} variant="neutral" class="slds-m-bottom_small"></lightning-button>
+                            </div>
+                        </template>
+                    </div>
                 </div>
 
                 <template if:false={canResendCode}>
