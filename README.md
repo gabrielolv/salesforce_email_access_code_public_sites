@@ -1,6 +1,6 @@
 # Email Verification
 
-This Salesforce Acceso Code handles secure access to the Salesforce Public Site by verifying external users through their company email address. It ensures that only authorized domains can access the Salesforce Site without using Experience Sites and the need to purchase licenses, since the Salesforce Site uses Guest Licenses.
+This Salesforce Acces Code handles secure access to the Salesforce Public Site by verifying external users through their company email address. It ensures that only authorized domains can access the Salesforce Site without using Experience Sites and the need to purchase licenses, since the Salesforce Site uses Guest Licenses.
 
 ## 🔐 Email Verification Workflow
 
