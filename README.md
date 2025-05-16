@@ -30,6 +30,7 @@ This Salesforce Acces Code handles secure access to the Salesforce Public Site b
 | Class Name               | Purpose                                        |
 |--------------------------|------------------------------------------------|
 | `Email_Verification__c`| Object storing Access Code |
+| `Verification_Attempt__c`| Object storing Email attempts |
 
 ### Apex Class
 
