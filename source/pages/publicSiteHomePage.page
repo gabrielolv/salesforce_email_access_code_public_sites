@@ -1,0 +1,14 @@
+<apex:page >
+    <apex:includeLightning />
+    <div id="lightning">
+    </div>
+    <script>
+        $Lightning.use("c:publicSiteApp", function() {
+            $Lightning.createComponent(
+                "c:emailVerifier",
+                {},
+                "lightning"
+            );
+        });
+    </script>
+</apex:page>

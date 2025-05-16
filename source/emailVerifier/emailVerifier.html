@@ -1,0 +1,42 @@
+<template>
+    <div class="slds-grid slds-grid_vertical-align-center slds-grid_align-center slds-p-around_medium" style="min-height: 100vh;">
+        <div class={containerClass}>
+            <template if:false={isSuccessStep}>
+                <h2 class="slds-text-heading_medium slds-m-bottom_medium slds-text-align_center">Access Verification</h2>
+            </template>         
+
+            <template if:true={error}>
+                <div class="slds-text-color_error slds-m-bottom_small slds-text-align_center">{error}</div>
+            </template>
+
+            <!-- Step 1: Enter email -->
+            <template if:true={isRequestStep}>
+                <lightning-input label="Company Email" value={email} onchange={handleEmailChange} class="slds-m-bottom_small"></lightning-input>
+                <div class="slds-text-align_center">
+                    <lightning-button label="Verify Email" onclick={handleVerifyEmail} class="slds-m-bottom_medium"></lightning-button>
+                </div>
+            </template>
+
+            <!-- Step 2: Enter access code -->
+            <template if:true={isVerifyStep}>
+                <lightning-input label="Access Code" value={accessCode} onchange={handleCodeChange} class="slds-m-bottom_small"></lightning-input>
+                <div class="slds-text-align_center">
+                    <lightning-button variant="brand" label="Verify Code" onclick={handleVerify} class="slds-m-bottom_small"></lightning-button>
+                    <template if:true={canResendCode}>
+                        <lightning-button label="Resend Code" onclick={handleResendCode} variant="neutral"></lightning-button>
+                    </template>
+                </div>
+
+                <template if:false={canResendCode}>
+                    <p class="slds-text-body_small slds-m-top_small slds-text-align_center">You can resend the code in a few seconds...</p>
+                </template>
+            </template>
+
+            <!-- Step 3: Verified -->
+            <template if:true={isSuccessStep}>
+                <p class="slds-text-heading_small slds-text-align_center">Email verified successfully.</p>
+                <!--<c-rfp-form email={email}></c-rfp-form>-->
+            </template>
+        </div>
+    </div>
+</template>
