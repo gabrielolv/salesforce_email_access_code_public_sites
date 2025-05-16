@@ -9,6 +9,11 @@ public without sharing class EmailVerifierController {
         if (domains.isEmpty()) {
             throw new AuraHandledException('No email domains found.');
         }
+
+        if (isEmailValid) {
+            throw new AuraHandledException('Email is locked. Please contact support.');
+        }
+
         for (Email_Domain__mdt domain : domains) {
             if ( String.isBlank(email) || (email.endsWith(domain.Label) && domain.Is_Active__c) ) {
                 isValid = true;
@@ -33,9 +38,9 @@ public without sharing class EmailVerifierController {
 
             Messaging.SingleEmailMessage mail = new Messaging.SingleEmailMessage();
             mail.setToAddresses(new String[] { email });
-            mail.setSubject('Your Access Code');
+            mail.setSubject('Your RFP Access Code');
             mail.setHtmlBody('Your access code is: <strong>' + code + '</strong>');
-            mail.setOrgWideEmailAddressId([SELECT Id FROM OrgWideEmailAddress WHERE DisplayName = 'Access Code Sender' LIMIT 1].Id);
+            mail.setOrgWideEmailAddressId([SELECT Id FROM OrgWideEmailAddress WHERE DisplayName = 'RFP Sender' LIMIT 1].Id);
             Messaging.sendEmail(new Messaging.SingleEmailMessage[] { mail });
         }catch(DmlException e){
             throw new AuraHandledException('Error sending email: ' + e.getMessage());  
@@ -44,27 +49,39 @@ public without sharing class EmailVerifierController {
 
     @AuraEnabled
     public static Boolean verifyAccessCode(String email, String code) {
-        Boolean isValid = lockEmail(email, true);
+        Boolean isEmailValid = lockEmail(email, true);
+        Boolean isAccessCodeValid = false;
 
-        if (isValid) {
+        if (isEmailValid) {
             throw new AuraHandledException('Email is locked. Please contact support.');
         }
 
-        List<Email_Verification__c> verification = [
-            SELECT Id FROM Email_Verification__c
-            WHERE Email__c = :String.escapeSingleQuotes(email)
-                AND Access_Code__c = :String.escapeSingleQuotes(code)
-                AND Expires_At__c >= :System.now()
-            ORDER BY CreatedDate DESC
-            LIMIT 1
-        ];
-        return !verification.isEmpty();
+        try{
+            List<Email_Verification__c> verification = [
+                SELECT Id FROM Email_Verification__c
+                WHERE Email__c = :String.escapeSingleQuotes(email)
+                    AND Access_Code__c = :String.escapeSingleQuotes(code)
+                    AND Expires_At__c >= :System.now()
+                ORDER BY CreatedDate DESC
+                LIMIT 1
+            ];
+
+            if (!verification.isEmpty()) {
+                isAccessCodeValid = true;
+                delete verification;
+                deleteAttempts(email);
+            }
+        }catch(DmlException e){
+            throw new AuraHandledException('Error verifying access code: ' + e.getMessage());
+        }
+
+        return isAccessCodeValid;
     }
 
     public static Boolean lockEmail(String email, Boolean createAttempt){
         Boolean isLocked = false;
-        List<RFP_Verification_Attempt__c> recentAttempts = [
-        SELECT Id, Attempt__c, Is_Locked__c FROM RFP_Verification_Attempt__c
+        List<Verification_Attempt__c> recentAttempts = [
+        SELECT Id, Attempt__c, Is_Locked__c FROM Verification_Attempt__c
         WHERE Email__c = :String.escapeSingleQuotes(email)
         LIMIT 1
         ];
@@ -78,7 +95,7 @@ public without sharing class EmailVerifierController {
             }
         }
         if(createAttempt && !isLocked && recentAttempts.isEmpty()){
-            RFP_Verification_Attempt__c attempt = new RFP_Verification_Attempt__c(
+            Verification_Attempt__c attempt = new Verification_Attempt__c(
                 Email__c = email,
                 Attempt__c = 1
             );
@@ -90,5 +107,15 @@ public without sharing class EmailVerifierController {
         }
 
         return isLocked;
+    }
+
+    public static void deleteAttempts(String email){
+        List<Verification_Attempt__c> attempts = [
+            SELECT Id FROM RFP_Verification_Attempt__c
+            WHERE Email__c = :String.escapeSingleQuotes(email)
+        ];
+        if(!attempts.isEmpty()){
+            delete attempts;
+        }
     }
 }
